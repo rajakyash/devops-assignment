@@ -15,6 +15,15 @@ pipeline {
             }
         }
 
+        stage('Run Docker Container') {
+            steps {
+                sh '''
+                docker rm -f devops-container || true
+                docker run -d -p 3000:3000 --name devops-container devops-app
+                '''
+            }
+        }
+
         stage('Terraform Init') {
             steps {
                 sh 'cd terraform && terraform init'
