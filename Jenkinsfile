@@ -24,6 +24,26 @@ pipeline {
             }
         }
 
+        stage('Install Trivy') {
+            steps {
+                sh '''
+                sudo apt-get update
+                sudo apt-get install -y wget
+                wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.1_Linux-64bit.deb
+                sudo dpkg -i trivy_0.50.1_Linux-64bit.deb
+                '''
+            }
+        }
+
+        stage('Terraform Security Scan') {
+            steps {
+                sh '''
+                echo "Running Trivy security scan on Terraform code"
+                trivy config terraform/
+                '''
+            }
+        }
+
         stage('Terraform Init') {
             steps {
                 sh 'cd terraform && terraform init'
@@ -35,6 +55,7 @@ pipeline {
                 sh 'cd terraform && terraform plan'
             }
         }
+
 
     }
 }
